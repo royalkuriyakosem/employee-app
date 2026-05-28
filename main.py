@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from dataclasses import dataclass
 from typing import TypedDict
+from middleware import configure_middleware
 from middleware.logger  import RequestLoggingMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from database import create_tables, get_db
@@ -12,6 +13,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Body, Depends
 from models.employee import Employee
+from routers.employee_router import router as employee_router
+from config import APP_ENV
 import logging
 
 
@@ -35,25 +38,21 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+configure_middleware(app)
 
 
 
-app.add_middleware(RequestLoggingMiddleware)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app.include_router(employee_router)
 
 
 
-
-@app.get("/", tags=["root"])
+@app.get("/health", tags=["root"])
 def root():
     return {
-        "message": "Welcome to Employee App"
+        "status" : "healthy",
+        "message": "Welcome to Employee App",
+        "env" : APP_ENV
+
     }
 
 
@@ -87,89 +86,89 @@ def get_next_id():
     return _id+1
 
 
-@app.get("/employee", tags=["Employees"])
-async def get_all_employees(db: AsyncSession = Depends(get_db)):
-    stmt = select(Employee).where(Employee.deleted_at.is_(None))
-    result = await db.scalars(stmt)
-    return [r.to_api_dict() for r in result.all()]
+# @app.get("/employee", tags=["Employees"])
+# async def get_all_employees(db: AsyncSession = Depends(get_db)):
+#     stmt = select(Employee).where(Employee.deleted_at.is_(None))
+#     result = await db.scalars(stmt)
+#     return [r.to_api_dict() for r in result.all()]
 
 #TODO
 #check if the employee is deleted
 #if it is raise and exception
-@app.get("/employee/{employee_id}", tags=["Employees"])
-async def get_employees_by_id(employee_id , db: AsyncSession = Depends(get_db)):
-    stmt = select(Employee).where(Employee.id == int(employee_id))
-    result = await db.scalars(stmt)
-    # return [r.to_api_dict() for r in result.all()]
-    return result.all()
+# @app.get("/employee/{employee_id}", tags=["Employees"])
+# async def get_employees_by_id(employee_id , db: AsyncSession = Depends(get_db)):
+#     stmt = select(Employee).where(Employee.id == int(employee_id))
+#     result = await db.scalars(stmt)
+#     # return [r.to_api_dict() for r in result.all()]
+#     return result.all()
 
 
-@app.post("/employee", status_code=status.HTTP_201_CREATED, tags=["Employees"])
-async def create_employee(body: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    name = body.get("name")
-    email = body.get("email")
-    if not isinstance(name, str) or not name.strip():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="name must be a non-empty string")
-    if not isinstance(email, str) or not email.strip():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="email must be a non-empty string")
-    db_employee = Employee(name=name.strip(), email=email.strip())
-    db.add(db_employee)
-    try:
-        await db.commit()
-    except IntegrityError:
-        await db.rollback()
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Email '{email.strip()}' is already in use")
-    await db.refresh(db_employee)
-    return db_employee.to_api_dict()
+# @app.post("/employee", status_code=status.HTTP_201_CREATED, tags=["Employees"])
+# async def create_employee(body: dict = Body(...), db: AsyncSession = Depends(get_db)):
+#     name = body.get("name")
+#     email = body.get("email")
+#     if not isinstance(name, str) or not name.strip():
+#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="name must be a non-empty string")
+#     if not isinstance(email, str) or not email.strip():
+#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="email must be a non-empty string")
+#     db_employee = Employee(name=name.strip(), email=email.strip())
+#     db.add(db_employee)
+#     try:
+#         await db.commit()
+#     except IntegrityError:
+#         await db.rollback()
+#         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Email '{email.strip()}' is already in use")
+#     await db.refresh(db_employee)
+#     return db_employee.to_api_dict()
 
 
 #TODO
 #check if the employee is deleted
 #if it is raise and exception
-@app.patch("/employee/{employee_id}", status_code=status.HTTP_201_CREATED, tags=["Employees"])
-async def create_employee(employee_id:int, body: dict = Body(...), db: AsyncSession = Depends(get_db)):
-    stmt = select(Employee).where(Employee.id == employee_id)
-    result = await db.scalars(stmt)
-    db_employee = result.first()
+# @app.patch("/employee/{employee_id}", status_code=status.HTTP_201_CREATED, tags=["Employees"])
+# async def create_employee(employee_id:int, body: dict = Body(...), db: AsyncSession = Depends(get_db)):
+#     stmt = select(Employee).where(Employee.id == employee_id)
+#     result = await db.scalars(stmt)
+#     db_employee = result.first()
 
-    if not db_employee or db_employee.deleted_at is NULL:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST , detail=f'User not found')
+#     if not db_employee or db_employee.deleted_at is NULL:
+#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST , detail=f'User not found')
     
-    if "name" in body:
-        db_employee.name = body.get("name")
+#     if "name" in body:
+#         db_employee.name = body.get("name")
     
-    if "email" in body:
-        db_employee.email = body.get("email")
-    db.add(db_employee)
-    try:
-        await db.commit()
-    except IntegrityError:
-        await db.rollback()
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Email '{email.strip()}' is already in use")
-    await db.refresh(db_employee)
-    return db_employee.to_api_dict()
+#     if "email" in body:
+#         db_employee.email = body.get("email")
+#     db.add(db_employee)
+#     try:
+#         await db.commit()
+#     except IntegrityError:
+#         await db.rollback()
+#         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Email '{email.strip()}' is already in use")
+#     await db.refresh(db_employee)
+#     return db_employee.to_api_dict()
 
 
-@app.delete("/employee/{employee_id}", status_code=status.HTTP_200_OK, tags=["employee"])
-async def delete_employees_by_id(employee_id : int, db : AsyncSession = Depends(get_db)):
-    stmt = select(Employee).where(Employee.id == employee_id)
-    result = await db.scalars(stmt)
-    db_employee = result.first()
+# @app.delete("/employee/{employee_id}", status_code=status.HTTP_200_OK, tags=["employee"])
+# async def delete_employees_by_id(employee_id : int, db : AsyncSession = Depends(get_db)):
+#     stmt = select(Employee).where(Employee.id == employee_id)
+#     result = await db.scalars(stmt)
+#     db_employee = result.first()
 
-    if not db_employee or db_employee.deleted_at is NULL:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST , detail=f'User not found')
+#     if not db_employee or db_employee.deleted_at is NULL:
+#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST , detail=f'User not found')
     
-    # db_employee.deleted_at = 
+#     # db_employee.deleted_at = 
 
-    db.add(db_employee)
+#     db.add(db_employee)
 
-    try:
-        await db.commit()
-    except IntegrityError:
-        await db.rollback()
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'User not found')
-    await db.refresh(db_employee)
-    return {"message":"Employee deleted sucessfully"}
+#     try:
+#         await db.commit()
+#     except IntegrityError:
+#         await db.rollback()
+#         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'User not found')
+#     await db.refresh(db_employee)
+#     return {"message":"Employee deleted sucessfully"}
 
 
 
