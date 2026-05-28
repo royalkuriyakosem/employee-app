@@ -13,7 +13,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Body, Depends
 from models.employee import Employee
-from routers.employee_router import router as employee_router
+from employees.router import router as employee_router
 from config import APP_ENV
 import logging
 

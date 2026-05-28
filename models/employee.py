@@ -3,13 +3,18 @@ Employee entity — ORM mapped class for table `employees`.
 """
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, Optional, TYPE_CHECKING
 
 from sqlalchemy import DateTime, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from models import Entity
 from models.entity import datetime_to_iso
+from models.address import Address
 
+if TYPE_CHECKING:
+    from models.employee import Employee
+else:
+    Employee = "Employee"
 
 
 class Employee(Entity):
@@ -19,7 +24,7 @@ class Employee(Entity):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     age: Mapped[int] = mapped_column(Integer, nullable=True)
-    addresses: Mapped[list["Address"]] = relationship(
+    addresses: Mapped[list["Address"]] = relationship( #type:ignore
         "Address",
         back_populates="employee",
     )

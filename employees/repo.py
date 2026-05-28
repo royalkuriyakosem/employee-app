@@ -32,15 +32,15 @@ async def get_all_employees(db: AsyncSession):
 
 #TODO
 # check if on arg comes in update employees
-async def update_employee(employee_id:int, db: AsyncSession, name:str = None, email:str = None):
-    db.add(db_employee)
-    try:
-        await db.commit()
-    except IntegrityError:
-        await db.rollback()
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Email '{email.strip()}' is already in use")
-    await db.refresh(db_employee)
-    return db_employee.to_api_dict()
+# async def update_employee(employee_id:int, db: AsyncSession, name:str = None, email:str = None):
+#     db.add(db_employee)
+#     try:
+#         await db.commit()
+#     except IntegrityError:
+#         await db.rollback()
+#         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Email '{email.strip()}' is already in use")
+#     await db.refresh(db_employee)
+#     return db_employee.to_api_dict()
 
 async def delete_employees_by_id(db_employee :Employee, db: AsyncSession):
     
