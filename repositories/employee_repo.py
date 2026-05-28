@@ -33,18 +33,6 @@ async def get_all_employees(db: AsyncSession):
 #TODO
 # check if on arg comes in update employees
 async def update_employee(employee_id:int, db: AsyncSession, name:str = None, email:str = None):
-    stmt = select(Employee).where(Employee.id == employee_id)
-    result = await db.scalars(stmt)
-    db_employee = result.first()
-
-    if not db_employee or db_employee.deleted_at is not None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST , detail=f'User not found')
-    
-    if name is not None:
-        db_employee.name = name
-    
-    if email is not None:
-        db_employee.email = email
     db.add(db_employee)
     try:
         await db.commit()
@@ -54,15 +42,9 @@ async def update_employee(employee_id:int, db: AsyncSession, name:str = None, em
     await db.refresh(db_employee)
     return db_employee.to_api_dict()
 
-async def delete_employees_by_id(employee_id : int, db : AsyncSession):
-    stmt = select(Employee).where(Employee.id == employee_id )
-    result = await db.scalars(stmt)
-    db_employee = result.first()
-    #TODO
-    # do delete by feteching the user and if not exists
+async def delete_employees_by_id(db_employee :Employee, db: AsyncSession):
     
     db_employee.deleted_at = datetime.now()
-
     db.add(db_employee)
 
     try:
@@ -72,6 +54,13 @@ async def delete_employees_by_id(employee_id : int, db : AsyncSession):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'User not found')
     await db.refresh(db_employee)
     return {"message":"Employee deleted sucessfully"}
+
+
+async def search_employees_by_name(employee_name:str, db: AsyncSession):
+    stmt = select(Employee).where(Employee.name.like(f"%{employee_name}%"))
+    result =  await db.scalars(stmt)
+    db_employee = result.all()
+    return db_employee
 
 
 

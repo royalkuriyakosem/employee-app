@@ -15,6 +15,11 @@ async def create_employee(body: dict = Body(...), db: AsyncSession = Depends(get
     db_employee = await employee_service.create_employee(name, email, db)
     return db_employee.to_api_dict()
 
+@router.get("/search", status_code=status.HTTP_200_OK, tags=["Employees"])
+async def search_employee_by_name(employee_name:str, db: AsyncSession = Depends(get_db)):
+    employees = await employee_service.search_employee_by_name(employee_name, db)
+    return [employee.to_api_dict() for employee in employees]
+
 @router.get("/{employee_id}", tags=["Employees"])
 async def get_employees_by_id(employee_id : int , db: AsyncSession = Depends(get_db)):
     db_employees  = await employee_service.get_employees_by_id(employee_id , db)
@@ -24,6 +29,8 @@ async def get_employees_by_id(employee_id : int , db: AsyncSession = Depends(get
 async def get_all_employees(db: AsyncSession = Depends(get_db)):
     db_employees  = await employee_service.get_all_employees(db)
     return [employee.to_api_dict() for employee in db_employees]
+
+
 
 @router.delete("/{employee_id}", status_code=status.HTTP_200_OK, tags=["Employees"])
 async def delete_employees_by_id(employee_id : int, db : AsyncSession = Depends(get_db)):
@@ -36,3 +43,6 @@ async def update_employee(employee_id:int, body: dict = Body(...), db: AsyncSess
     email = body.get("email")
     employee = await employee_service.update_employee(employee_id, db, name, email)
     return employee
+
+
+    
