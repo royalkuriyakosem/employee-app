@@ -97,7 +97,7 @@ from database.connection import Base
 # makes `--autogenerate` think a table should be DROPPED. This is the #1 autogenerate gotcha.
 import models.address  # noqa: F401
 # import models.associations  # noqa: F401
-# import models.department  # noqa: F401
+import models.department  # noqa: F401
 import models.employee  # noqa: F401
 
 config = context.config

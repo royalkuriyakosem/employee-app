@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Body, Depends
 from models.employee import Employee
 from employees.router import router as employee_router
+from department.router import router as department_router
 from config import APP_ENV
 import logging
 
@@ -43,6 +44,7 @@ configure_middleware(app)
 
 
 app.include_router(employee_router)
+app.include_router(department_router)
 
 
 
@@ -173,4 +175,4 @@ def get_next_id():
 
 
 if __name__ == "__main__":
-    main()
+    main() # type: ignore
