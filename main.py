@@ -2,12 +2,9 @@ from fastapi import FastAPI
 from dataclasses import dataclass
 from typing import TypedDict
 from middleware import configure_middleware
-from middleware.logger  import RequestLoggingMiddleware
-from fastapi.middleware.cors import CORSMiddleware
 from database import create_tables, get_db
 from contextlib import asynccontextmanager
 from fastapi import HTTPException
-from fastapi import status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,7 +12,8 @@ from fastapi import Body, Depends
 from models.employee import Employee
 from employees.router import router as employee_router
 from department.router import router as department_router
-from config import APP_ENV
+from config import settings
+from exceptions.handlers import register_exception_handler
 import logging
 
 
@@ -40,9 +38,7 @@ app = FastAPI(
 )
 
 configure_middleware(app)
-
-
-
+app.exception_handler(register_exception_handler(app))
 app.include_router(employee_router)
 app.include_router(department_router)
 
@@ -53,7 +49,7 @@ def root():
     return {
         "status" : "healthy",
         "message": "Welcome to Employee App",
-        "env" : APP_ENV
+        "env" : settings.app_env
 
     }
 

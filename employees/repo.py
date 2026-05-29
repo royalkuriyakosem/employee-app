@@ -6,19 +6,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select
 from datetime import datetime
+from exceptions import ConflictException
+from employees.schemas import EmployeeCreate
 
 
-
-async def create_employee(name: str, email: str, db: AsyncSession) -> Employee:
-    db_employee = Employee(name=name.strip(), email=email.strip())
-    db.add(db_employee)
+async def create_employee(employee: EmployeeCreate, db: AsyncSession) -> Employee:
+    db.add(employee)
     try:
         await db.commit()
     except IntegrityError:
         await db.rollback()
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Email '{email}' is already in use")
-    await db.refresh(db_employee)
-    return db_employee
+        raise ConflictException(f"Email '{employee.email}' is already in use")
+    await db.refresh(employee)
+    return employee
 
 async def get_employees_by_id(employee_id: int, db: AsyncSession):
     stmt = select(Employee).where(Employee.id == employee_id)
@@ -46,12 +46,6 @@ async def delete_employees_by_id(db_employee :Employee, db: AsyncSession):
     
     db_employee.deleted_at = datetime.now()
     db.add(db_employee)
-
-    try:
-        await db.commit()
-    except IntegrityError:
-        await db.rollback()
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'User not found')
     await db.refresh(db_employee)
     return {"message":"Employee deleted sucessfully"}
 
