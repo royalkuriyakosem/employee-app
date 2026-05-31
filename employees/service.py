@@ -6,6 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from models.employee import Employee
 from exceptions import NotFoundException, BadRequestException
 from employees.schemas import EmployeeCreate
+from auth.utils import hash_password
+
+    
 
 
 
@@ -13,13 +16,14 @@ from employees.schemas import EmployeeCreate
 async def create_employee(employee: EmployeeCreate, db: AsyncSession) -> Employee:
     name = employee.name
     email= employee.email
+    hashed = hash_password(employee.password)
     if not isinstance(name, str) or not name.strip():
         raise BadRequestException("name must be a non-empty string")
     if not isinstance(email, str) or not email.strip():
         raise BadRequestException("email must be a non-empty string")
     
-    employee = await repo.create_employee(employee, db)
-    return employee
+    db_employee = await repo.create_employee(employee, db, hashed)
+    return db_employee
 
 async def get_employees_by_id(employee_id: int , db: AsyncSession) -> Employee:
     employee = await repo.get_employees_by_id(employee_id , db)

@@ -12,6 +12,7 @@
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
+            "cwd" : "${workspaceFolder}",
             "args": [
                 "main:app",
                 "--reload"

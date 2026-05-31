@@ -1,4 +1,4 @@
-from exceptions import NotFoundException, ConflictException, BadRequestException
+from exceptions import NotFoundException, ConflictException, BadRequestException, UnauthorizedException
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 from fastapi import Request
@@ -11,7 +11,8 @@ logger = logging.getLogger(__name__)
 _STATUS_MAP: dict[type[AppException], int] = {
     NotFoundException: status.HTTP_404_NOT_FOUND,
     ConflictException: status.HTTP_409_CONFLICT,
-    BadRequestException: status.HTTP_400_BAD_REQUEST
+    BadRequestException: status.HTTP_400_BAD_REQUEST,
+    UnauthorizedException: status.HTTP_401_UNAUTHORIZED
 }
 
 def register_exception_handler(app: FastAPI):

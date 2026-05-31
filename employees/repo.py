@@ -1,7 +1,8 @@
 """Employee repo"""
 
 from fastapi import HTTPException, status
-from models.employee import Employee
+from sqlalchemy.orm import Session
+from models.employee import Employee, Address
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select
@@ -10,7 +11,19 @@ from exceptions import ConflictException
 from employees.schemas import EmployeeCreate
 
 
-async def create_employee(employee: EmployeeCreate, db: AsyncSession) -> Employee:
+
+async def get_by_email(db:Session, email: str) -> Employee | None:
+    stmt = select(Employee).where(
+        Employee.email == email,
+        Employee.deleted_at.is_(None)
+        )
+    db_email = await db.scalars(stmt)
+    return db_email.first()
+
+
+async def create_employee(body: EmployeeCreate, db: AsyncSession, hashed: str) -> Employee:
+    address = Address(line1 = body.address.line1, city = body.address.city, postal_code = body.address.postal_code, country = body.address.country)
+    employee = Employee(name=body.name, email=body.email, age=body.age, address=[address], password_hash=hashed)
     db.add(employee)
     try:
         await db.commit()
@@ -20,8 +33,9 @@ async def create_employee(employee: EmployeeCreate, db: AsyncSession) -> Employe
     await db.refresh(employee)
     return employee
 
+
 async def get_employees_by_id(employee_id: int, db: AsyncSession):
-    stmt = select(Employee).where(Employee.id == employee_id)
+    stmt = select(Employee).where(Employee.id == employee_id, Employee.deleted_at.is_(None))
     result = await db.scalars(stmt)
     return result.first()
 

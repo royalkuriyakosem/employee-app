@@ -26,14 +26,17 @@ class AddressCreate(BaseModel):
         if country in ("IND") and n!=6:
             raise ValueError("Indain PostCodes are of length 6")
         
+        return self
+        
 
 class EmployeeCreate(BaseModel):
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
 
     name: str
     email: str
+    password: str = Field(min_length=6)
     age: int | None = Field(ge=0, le=150)
-    addresses: AddressCreate | None = None
+    address: AddressCreate  
 
 class EmployeeeResponse(BaseModel):
     model_config = ConfigDict(

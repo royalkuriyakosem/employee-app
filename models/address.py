@@ -17,7 +17,7 @@ class Address(Entity):
 
     line1: Mapped[str] = mapped_column(String(100), nullable=False)
     city: Mapped[str] = mapped_column(String(100), nullable=False)
-    postal_code: Mapped[int] = mapped_column(Integer, nullable=False)
+    postal_code: Mapped[str] = mapped_column(String(100), nullable=False)
     country: Mapped[str] = mapped_column(String(100), nullable=False)
     employee_id: Mapped[int] = mapped_column(
         "Integer",
@@ -25,4 +25,4 @@ class Address(Entity):
         nullable=False,
         index=True,
     )
-    employee: Mapped["Employee"] = relationship(Employee, back_populates="addresses")
+    employee: Mapped["Employee"] = relationship(Employee, back_populates="address")

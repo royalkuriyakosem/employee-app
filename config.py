@@ -13,7 +13,10 @@ class Settings(BaseSettings):
     database_url : str
     app_env : str = "development"
     debug : bool = False
-
+    jwt_secret: str 
+    jwt_algorithm: str
+    jwt_expiry_minutes: int
+   
     model_config = SettingsConfigDict(
         env_file=".env"
     )
