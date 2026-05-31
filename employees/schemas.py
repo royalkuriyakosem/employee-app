@@ -38,7 +38,7 @@ class EmployeeCreate(BaseModel):
     age: int | None = Field(ge=0, le=150)
     address: AddressCreate  
 
-class EmployeeeResponse(BaseModel):
+class EmployeeResponse(BaseModel):
     model_config = ConfigDict(
         from_attributes=True
     )
@@ -47,7 +47,17 @@ class EmployeeeResponse(BaseModel):
     email: str
     age: int | None
 
-class GetEmployeeById(EmployeeeResponse):
+class GetEmployeeById(EmployeeResponse):
     created_at: datetime
     updated_at: datetime
     
+# class GetAllAddress(AddressCreate):
+#     employee: str
+
+
+class UpdateEmployee(BaseModel):
+    name: str
+    email: str
+
+class AddressResponse(AddressCreate):
+    id: int
