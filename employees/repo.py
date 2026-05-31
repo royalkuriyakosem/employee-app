@@ -50,6 +50,7 @@ async def update_employee(employee:Employee, db: AsyncSession, name:str = None, 
         employee.name = name
     if email is not None:
         employee.email = email
+    employee.updated_at = datetime.now()
     db.add(employee)
     try:
         await db.commit()
