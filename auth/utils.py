@@ -13,7 +13,7 @@ def create_access_token(data: dict) -> str:
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(minutes=settings.jwt_expiry_minutes)
     to_encode["exp"] = expire
-
+    to_encode["type"] = "access"
     return jwt.encode(to_encode, settings.jwt_secret, algorithm=settings.jwt_algorithm)
 
 def decode_access_token(token: str) -> dict | None:
@@ -21,3 +21,18 @@ def decode_access_token(token: str) -> dict | None:
         return jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
     except JWTError:
         return None
+    
+def create_refresh_token(data: dict) -> str:
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.jwt_refresh_expiry)
+    to_encode["exp"] = expire
+    to_encode["type"] = "refresh"
+
+    return jwt.encode(to_encode, settings.jwt_refresh_secret, algorithm=settings.jwt_refresh_algorithm)
+
+def decode_refresh_token(token: str) -> dict | None:
+    try:
+        return jwt.decode(token, settings.jwt_refresh_secret, algorithms=[settings.jwt_refresh_algorithm])
+    except JWTError:
+        return None
+    
