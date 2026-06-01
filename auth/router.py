@@ -8,6 +8,9 @@ from auth import service
 from database.connection import get_db
 from auth.schemas import LoginRequest, TokenResponse
 from fastapi.security import OAuth2PasswordRequestForm
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -28,4 +31,5 @@ async def login(
     token = await service.login_access(
         db, form.username, form.password
     )
+    logger.info(f"User {form.username} logged in sucessfully")
     return TokenResponse(access_token=token, refresh_token=token)
