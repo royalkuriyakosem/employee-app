@@ -48,7 +48,7 @@ app.include_router(associations_router)
 
 
 @app.get("/health", tags=["root"])
-def root():
+async def root():
     return {
         "status" : "healthy",
         "message": "Welcome to Employee App",

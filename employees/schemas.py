@@ -36,7 +36,8 @@ class EmployeeCreate(BaseModel):
     email: str
     password: str = Field(min_length=6)
     age: int | None = Field(ge=0, le=150)
-    address: AddressCreate  
+    address: AddressCreate | None = None
+
 
 class EmployeeResponse(BaseModel):
     model_config = ConfigDict(
