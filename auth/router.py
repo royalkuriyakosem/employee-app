@@ -1,19 +1,14 @@
-
-
-
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from auth import service
 from database.connection import get_db
-from auth.schemas import LoginRequest, TokenResponse
+from auth.schemas import TokenResponse
 from fastapi.security import OAuth2PasswordRequestForm
 import logging
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
-
 
 
 # @router.post("/login", response_model=TokenResponse)
@@ -25,11 +20,8 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/login")
 async def login(
-    form: OAuth2PasswordRequestForm = Depends(),
-    db: AsyncSession = Depends(get_db)
+    form: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
-    token = await service.login_access(
-        db, form.username, form.password
-    )
+    token = await service.login_access(db, form.username, form.password)
     logger.info(f"User {form.username} logged in sucessfully")
     return TokenResponse(access_token=token, refresh_token=token)

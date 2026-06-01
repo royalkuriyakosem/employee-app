@@ -23,13 +23,10 @@ async def test_create_employee_persists_the_record():
 
     async with session_factory() as db:
         body = EmployeeCreate(
-            name="Ada",
-            email="ada@example.com",
-            password="secret123",
-            age = 23
+            name="Ada", email="ada@example.com", password="secret123", age=23
         )
         employee = await employee_service.create_employee(body, db)
-        
+
         assert employee.id is not None
         assert employee.name == "Ada"
         assert employee.email == "ada@example.com"

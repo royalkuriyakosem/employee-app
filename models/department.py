@@ -2,19 +2,17 @@
 Department Entitiy - ORM mapped class for table 'department'
 """
 
-
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String
-from models.entity import Entity, datetime_to_iso
-from typing import Any
+from models.entity import Entity
 
 
 class Department(Entity):
-    __abstract__= False
-    __tablename__="department"
+    __abstract__ = False
+    __tablename__ = "department"
 
     name: Mapped[int] = mapped_column(String(100), nullable=False)
-    
+
     # def to_api_dict(self) -> dict[str, Any]:
     #     """JSON-friendly representation (ISO 8601 for timestamps)."""
     #     return {

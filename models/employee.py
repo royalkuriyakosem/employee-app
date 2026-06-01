@@ -2,13 +2,11 @@
 Employee entity — ORM mapped class for table `employees`.
 """
 
-from datetime import datetime
-from typing import Any, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 import enum
-from sqlalchemy import DateTime, Integer, String, func, Enum
+from sqlalchemy import Integer, String, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from models import Entity
-from models.entity import datetime_to_iso
 from models.address import Address
 
 if TYPE_CHECKING:
@@ -16,11 +14,13 @@ if TYPE_CHECKING:
 else:
     Employee = "Employee"
 
+
 class EmployeeRole(str, enum.Enum):
     UI = "UI"
     UX = "UX"
     DEVELOPER = "Developer"
     HR = "HR"
+
 
 class Employee(Entity):
     __abstract__ = False
@@ -30,15 +30,15 @@ class Employee(Entity):
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     age: Mapped[int] = mapped_column(Integer, nullable=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    address: Mapped[list["Address"]] = relationship( #type:ignore
+    address: Mapped[list["Address"]] = relationship(  # type:ignore
         "Address",
         back_populates="employee",
     )
     role: Mapped[EmployeeRole] = mapped_column(
         Enum(
-            EmployeeRole, 
+            EmployeeRole,
             name="employeerole",
-            values_callable=lambda enum_cls: [e.value for e in enum_cls]
+            values_callable=lambda enum_cls: [e.value for e in enum_cls],
         )
     )
     # def to_api_dict(self) -> dict[str, Any]:
@@ -52,4 +52,3 @@ class Employee(Entity):
     #         "updated_at": datetime_to_iso(self.updated_at),
     #         "deleted_at": datetime_to_iso(self.deleted_at),
     #     }
-    

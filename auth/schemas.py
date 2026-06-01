@@ -1,13 +1,16 @@
 from pydantic import BaseModel
 
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     refresh_token: str
 
+
 class LoginRequest(BaseModel):
     email: str
     password: str
+
 
 class TokenPayload(BaseModel):
     id: int

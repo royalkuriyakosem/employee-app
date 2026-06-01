@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from middleware.logger  import RequestLoggingMiddleware
+from middleware.logger import RequestLoggingMiddleware
+
 
 def configure_middleware(app: FastAPI) -> None:
     """
