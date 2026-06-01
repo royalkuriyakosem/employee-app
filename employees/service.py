@@ -80,6 +80,7 @@ async def delete_address_by_id(address_id: int, db: AsyncSession):
 
 async def get_address_by_emp_id(employee_id: int, db: AsyncSession):
     address = await repo.get_address_by_emp_id(employee_id, db)
+    employee = await get_employees_by_id(employee_id, db)
     if address is None:
         raise NotFoundException("Address NOT FOUND")
     return address

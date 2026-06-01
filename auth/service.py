@@ -13,7 +13,11 @@ async def login_access (db: AsyncSession, email: str, password: str) -> str:
     if not verify_password(password, employee.password_hash):
         raise UnauthorizedException("Invalid email or password")
     
-    return create_access_token({"id": employee.id, "email": employee.email})
+    return create_access_token({
+            "id": employee.id,
+            "email": employee.email,
+            "role": employee.role.value
+            })
 
 async def login_refresh (db: AsyncSession, email: str, password: str) -> str:
     employee = await repo.get_by_email(db, email)

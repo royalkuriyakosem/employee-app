@@ -24,3 +24,6 @@ class BadRequestException(AppException):
 
 class UnauthorizedException(AppException):
     """If email and password is wrong"""
+
+class ForbiddenException(AppException):
+    """If you don't have permission"""

@@ -1,5 +1,6 @@
 from pydantic import BaseModel,Field, ConfigDict, field_validator, model_validator
 from datetime import datetime
+from models.employee import EmployeeRole
 
 class AddressCreate(BaseModel):
     line1: str
@@ -29,6 +30,7 @@ class AddressCreate(BaseModel):
         return self
         
 
+
 class EmployeeCreate(BaseModel):
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
 
@@ -37,6 +39,7 @@ class EmployeeCreate(BaseModel):
     password: str = Field(min_length=6)
     age: int | None = Field(ge=0, le=150)
     address: AddressCreate | None = None
+    role: EmployeeRole = EmployeeRole.DEVELOPER
 
 
 class EmployeeResponse(BaseModel):
@@ -62,3 +65,5 @@ class UpdateEmployee(BaseModel):
 
 class AddressResponse(AddressCreate):
     id: int
+    employee_name: str
+    

@@ -4,8 +4,8 @@ Employee entity — ORM mapped class for table `employees`.
 
 from datetime import datetime
 from typing import Any, Optional, TYPE_CHECKING
-
-from sqlalchemy import DateTime, Integer, String, func
+import enum
+from sqlalchemy import DateTime, Integer, String, func, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from models import Entity
 from models.entity import datetime_to_iso
@@ -16,6 +16,11 @@ if TYPE_CHECKING:
 else:
     Employee = "Employee"
 
+class EmployeeRole(str, enum.Enum):
+    UI = "UI"
+    UX = "UX"
+    DEVELOPER = "Developer"
+    HR = "HR"
 
 class Employee(Entity):
     __abstract__ = False
@@ -28,6 +33,13 @@ class Employee(Entity):
     address: Mapped[list["Address"]] = relationship( #type:ignore
         "Address",
         back_populates="employee",
+    )
+    role: Mapped[EmployeeRole] = mapped_column(
+        Enum(
+            EmployeeRole, 
+            name="employeerole",
+            values_callable=lambda enum_cls: [e.value for e in enum_cls]
+        )
     )
     # def to_api_dict(self) -> dict[str, Any]:
     #     """JSON-friendly representation (ISO 8601 for timestamps)."""

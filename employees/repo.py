@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select
 from datetime import datetime
 from exceptions import ConflictException
+from models.employee import EmployeeRole
 from employees.schemas import AddressResponse, EmployeeCreate
 
 
@@ -24,10 +25,7 @@ async def get_by_email(db:Session, email: str) -> Employee | None:
 async def create_employee(body: EmployeeCreate, db: AsyncSession, hashed: str) -> Employee:
     if body.address is not None:
         address = Address(line1 = body.address.line1, city = body.address.city, postal_code = body.address.postal_code, country = body.address.country)
-        employee = Employee(name=body.name, email=body.email, age=body.age, address=[address], password_hash=hashed)
-    
-    employee = Employee(name=body.name, email=body.email, age=body.age, password_hash=hashed)
-
+    employee = Employee(name=body.name, email=body.email, age=body.age, address = [address] if body.address is not None else [], password_hash=hashed, role=body.role)
     db.add(employee)
     try:
         await db.commit()

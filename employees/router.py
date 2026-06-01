@@ -1,19 +1,19 @@
 "Employee Router"
 
 from employees import service
-from fastapi import APIRouter, Depends, Body , HTTPException, status
+from fastapi import APIRouter, Depends, Body, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from employees.schemas import EmployeeCreate, AddressCreate, EmployeeResponse, GetEmployeeById, UpdateEmployee, AddressResponse
-from models import Employee
-from auth.dependencies import get_current_user
+from models.employee import Employee, EmployeeRole
+from auth.dependencies import get_current_user, require_role
 from auth.schemas import TokenPayload
 
 
 
 router = APIRouter(prefix="/employee", tags=["Employees"])
 
-@router.post("", status_code=status.HTTP_201_CREATED, tags=["Employees"])
+@router.post("", status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_role(EmployeeRole.HR))])
 async def create_employee(body: EmployeeCreate = Body(...), db: AsyncSession = Depends(get_db)):
     db_employee = await service.create_employee(body, db)
     return db_employee
@@ -24,7 +24,8 @@ async def search_employee_by_name(employee_name:str, db: AsyncSession = Depends(
     return [employee for employee in employees]
 
 @router.get("/address", response_model=list[AddressCreate], status_code=status.HTTP_200_OK)
-async def get_all_address(db: AsyncSession = Depends(get_db)):
+async def get_all_address(db: AsyncSession = Depends(get_db),  _current_user: TokenPayload = Depends(get_current_user)):
+    print(_current_user.role)
     addresses = await service.get_all_address(db)
     return addresses
 
@@ -71,7 +72,7 @@ async def get_all_employees(db: AsyncSession = Depends(get_db), _current_user: T
 
 
 
-@router.delete("/{employee_id}", status_code=status.HTTP_200_OK)
+@router.delete("/{employee_id}", status_code=status.HTTP_200_OK, dependencies=[Depends(require_role(EmployeeRole.HR))])
 async def delete_employees_by_id(employee_id : int, db : AsyncSession = Depends(get_db)):
     result = await service.delete_employees_by_id(employee_id, db)
     return result
