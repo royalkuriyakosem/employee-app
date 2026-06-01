@@ -12,6 +12,7 @@ from fastapi import Body, Depends
 from models.employee import Employee
 from employees.router import router as employee_router
 from department.router import router as department_router
+from associations.router import router as associations_router
 from config import settings
 from exceptions.handlers import register_exception_handler
 from auth.router import router as auth_router
@@ -43,6 +44,7 @@ app.exception_handler(register_exception_handler(app))
 app.include_router(employee_router)
 app.include_router(department_router)
 app.include_router(auth_router)
+app.include_router(associations_router)
 
 
 @app.get("/health", tags=["root"])
