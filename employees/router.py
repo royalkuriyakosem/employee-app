@@ -64,7 +64,11 @@ async def get_address_by_id(address_id: int, db: AsyncSession = Depends(get_db))
     return address
 
 
-@router.delete("/address/{address_id}", status_code=status.HTTP_200_OK)
+@router.delete(
+    "/address/{address_id}",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(require_role(EmployeeRole.HR))],
+)
 async def delete_address_by_id(address_id: int, db: AsyncSession = Depends(get_db)):
     result = await service.delete_address_by_id(address_id, db)
     return result
