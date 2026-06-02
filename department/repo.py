@@ -8,6 +8,7 @@ from sqlalchemy import select
 from fastapi import HTTPException, status
 from datetime import datetime
 from exceptions.handlers import NotFoundException
+from sqlalchemy.exc import IntegrityError
 
 
 async def get_all_departments(db: AsyncSession):
@@ -21,7 +22,7 @@ async def create_department(name: str, db: AsyncSession):
     db.add(department)
     try:
         await db.commit()
-    except:
+    except IntegrityError:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -44,7 +45,7 @@ async def delete_department(department: Department, db: AsyncSession):
     db.add(department)
     try:
         await db.commit()
-    except:
+    except IntegrityError:
         await db.rollback()
         raise NotFoundException("Department Not Found")
     return {"message": "Department deleted sucessfully"}

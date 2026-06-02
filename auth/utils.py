@@ -47,5 +47,6 @@ def decode_refresh_token(token: str) -> dict | None:
             settings.jwt_refresh_secret,
             algorithms=[settings.jwt_refresh_algorithm],
         )
-    except JWTError:
+    except JWTError as e:
+        print(f"Jwt error: {e}")
         return None
