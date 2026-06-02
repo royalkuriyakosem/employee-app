@@ -25,6 +25,8 @@ async def login_access(db: AsyncSession, email: str, password: str) -> str:
 
 async def refresh_access(refresh_token) -> str:
     decode = decode_refresh_token(refresh_token)
+    if decode is None:
+        return {"message": "Refresh token is Invalid"}
     print(decode)
     access_token = create_access_token(
         {
