@@ -24,19 +24,24 @@ async def map_associations(db: AsyncSession, body: AssociationCreate):
 
 
 async def delete_associations(db: AsyncSession, body: AssociationCreate):
-    employee_id = body.employee_id
-    department_id = body.department_id
+    emp_id = body.employee_id
+    dept_id = body.department_id
     stmt = select(Associations).where(
-        Associations.employee_id == employee_id,
-        Associations.department_id == department_id,
+        Associations.employee_id == emp_id, Associations.department_id == dept_id
     )
     result = await db.scalars(stmt)
     association = result.first()
+    print(association.deleted_at, datetime.now())
     association.deleted_at = datetime.now()
+    print(association.deleted_at, datetime.now())
+
     db.add(association)
+    print(association.deleted_at, datetime.now())
     try:
+        await db.commit()
         await db.refresh(association)
     except IntegrityError:
         await db.rollback()
         raise ConflictException("Associations not deleted")
+    print(association.deleted_at, datetime.now())
     return {"message": "Employee deleted from the department successfully"}

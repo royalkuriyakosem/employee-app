@@ -33,7 +33,10 @@ async def create_employee(
 
 
 @router.get(
-    "/search", status_code=status.HTTP_200_OK, response_model=list[EmployeeResponse]
+    "/search",
+    status_code=status.HTTP_200_OK,
+    response_model=list[EmployeeResponse],
+    dependencies=[Depends(require_role(EmployeeRole.HR))],
 )
 async def search_employee_by_name(
     employee_name: str, db: AsyncSession = Depends(get_db)
@@ -58,8 +61,13 @@ async def get_all_address(
     "/address/{address_id}",
     response_model=AddressResponse,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(require_role(EmployeeRole.HR))],
 )
-async def get_address_by_id(address_id: int, db: AsyncSession = Depends(get_db)):
+async def get_address_by_id(
+    address_id: int,
+    db: AsyncSession = Depends(get_db),
+    dependencies=[Depends(require_role(EmployeeRole.HR, EmployeeRole.DEVELOPER))],
+):
     address = await service.get_address_by_id(address_id, db)
     return address
 
@@ -69,7 +77,11 @@ async def get_address_by_id(address_id: int, db: AsyncSession = Depends(get_db))
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(require_role(EmployeeRole.HR))],
 )
-async def delete_address_by_id(address_id: int, db: AsyncSession = Depends(get_db)):
+async def delete_address_by_id(
+    address_id: int,
+    db: AsyncSession = Depends(get_db),
+    dependencies=[Depends(require_role(EmployeeRole.HR, EmployeeRole.DEVELOPER))],
+):
     result = await service.delete_address_by_id(address_id, db)
     return result
 
@@ -89,12 +101,20 @@ async def delete_address_by_id(address_id: int, db: AsyncSession = Depends(get_d
     response_model=list[AddressResponse],
     status_code=status.HTTP_201_CREATED,
 )
-async def get_address_by_emp_id(employee_id: int, db: AsyncSession = Depends(get_db)):
+async def get_address_by_emp_id(
+    employee_id: int,
+    db: AsyncSession = Depends(get_db),
+    dependencies=[Depends(require_role(EmployeeRole.HR, EmployeeRole.DEVELOPER))],
+):
     addresses = await service.get_address_by_emp_id(employee_id, db)
     return addresses
 
 
-@router.post("/{employee_id}/address", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/{employee_id}/address",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_role(EmployeeRole.HR, EmployeeRole.DEVELOPER))],
+)
 async def add_address(
     employee_id: int,
     address: AddressCreate = Body(...),
@@ -105,7 +125,11 @@ async def add_address(
 
 
 @router.get("/{employee_id}", response_model=GetEmployeeById)
-async def get_employees_by_id(employee_id: int, db: AsyncSession = Depends(get_db)):
+async def get_employees_by_id(
+    employee_id: int,
+    db: AsyncSession = Depends(get_db),
+    dependencies=[Depends(require_role(EmployeeRole.HR))],
+):
     db_employees = await service.get_employees_by_id(employee_id, db)
     return db_employees
 
@@ -113,7 +137,7 @@ async def get_employees_by_id(employee_id: int, db: AsyncSession = Depends(get_d
 @router.get("", response_model=list[EmployeeResponse])
 async def get_all_employees(
     db: AsyncSession = Depends(get_db),
-    _current_user: TokenPayload = Depends(get_current_user),
+    dependencies=[Depends(require_role(EmployeeRole.HR))],
 ):
     db_employees = await service.get_all_employees(db)
     return [employee for employee in db_employees]

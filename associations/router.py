@@ -3,6 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from associations import service
 from associations.schemas import AssociationCreate
+from auth.dependencies import require_role
+from models.employee import EmployeeRole
 
 
 router = APIRouter(prefix="/associations", tags=["Associations"])
@@ -10,15 +12,21 @@ router = APIRouter(prefix="/associations", tags=["Associations"])
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def create_associations(
-    db: AsyncSession = Depends(get_db), body: AssociationCreate = Body(...)
+    db: AsyncSession = Depends(get_db),
+    body: AssociationCreate = Body(...),
+    dependencies=[Depends(require_role(EmployeeRole.HR))],
 ):
     result = await service.add_associations(db, body)
     return result
 
 
+# TODO
+# Deletion not possible
 @router.delete("", status_code=status.HTTP_201_CREATED)
 async def delete_associations(
-    db: AsyncSession = Depends(get_db), body: AssociationCreate = Body(...)
+    db: AsyncSession = Depends(get_db),
+    body: AssociationCreate = Body(...),
+    dependencies=[Depends(require_role(EmployeeRole.HR))],
 ):
     result = await service.delete_associations(db, body)
     return result
