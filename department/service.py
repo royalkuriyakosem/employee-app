@@ -20,7 +20,7 @@ async def create_department(name: str, db: AsyncSession):
             detail="Department name must not be an empty string",
         )
     department = await repo.create_department(name, db)
-    return department.to_api_dict()
+    return department
 
 
 async def get_department_by_id(dept_id: int, db: AsyncSession):

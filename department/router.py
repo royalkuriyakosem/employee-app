@@ -13,7 +13,7 @@ router = APIRouter(prefix="/department", tags=["Department"])
 @router.get("", status_code=status.HTTP_302_FOUND)
 async def get_all_departments(db: AsyncSession = Depends(get_db)):
     departments = await service.get_all_departments(db)
-    return [department.to_api_dict() for department in departments]
+    return [department for department in departments]
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
