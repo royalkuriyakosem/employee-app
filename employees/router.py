@@ -11,6 +11,7 @@ from employees.schemas import (
     GetEmployeeById,
     UpdateEmployee,
     AddressResponse,
+    MessageResponse,
 )
 from models.employee import EmployeeRole
 from auth.dependencies import get_current_user, require_role
@@ -76,6 +77,7 @@ async def get_address_by_id(
 @router.delete(
     "/address/{address_id}",
     status_code=status.HTTP_200_OK,
+    response_model=MessageResponse,
     dependencies=[Depends(require_role(EmployeeRole.HR))],
 )
 async def delete_address_by_id(

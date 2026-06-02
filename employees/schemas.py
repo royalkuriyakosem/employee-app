@@ -67,3 +67,7 @@ class UpdateEmployee(BaseModel):
 class AddressResponse(AddressCreate):
     id: int
     # employee_name: str
+
+
+class MessageResponse(BaseModel):
+    message: str
