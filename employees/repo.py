@@ -86,7 +86,14 @@ async def delete_employees_by_id(db_employee: Employee, db: AsyncSession):
 
     db_employee.deleted_at = datetime.now()
     db.add(db_employee)
-    await db.refresh(db_employee)
+    try:
+        await db.commit()
+        await db.refresh(db_employee)
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Employee not deleted"
+        )
     return {"message": "Employee deleted sucessfully"}
 
 

@@ -159,7 +159,3 @@ def get_next_id():
 #         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'User not found')
 #     await db.refresh(db_employee)
 #     return {"message":"Employee deleted sucessfully"}
-
-
-if __name__ == "__main__":
-    main()  # type: ignore
