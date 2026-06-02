@@ -24,6 +24,7 @@ router = APIRouter(prefix="/employee", tags=["Employees"])
     "",
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(require_role(EmployeeRole.HR))],
+    response_model=EmployeeResponse,
 )
 async def create_employee(
     body: EmployeeCreate = Body(...), db: AsyncSession = Depends(get_db)
@@ -86,16 +87,6 @@ async def delete_address_by_id(
     return result
 
 
-# TODO Get all address with name of employee
-# @router.get("/address", response_model=list[GetAllAddress], status_code=status.HTTP_200_OK)
-# async def get_all_address(db: AsyncSession = Depends(get_db)):
-#     addresses = await service.get_all_address(db)
-#     return [{
-#         **address,
-#         "employee" : address.employee.name
-#     }
-#     for address in addresses
-#     ]
 @router.get(
     "/{employee_id}/address",
     response_model=list[AddressResponse],

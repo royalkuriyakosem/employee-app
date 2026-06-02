@@ -4,7 +4,7 @@ Employee entity — ORM mapped class for table `employees`.
 
 from typing import TYPE_CHECKING
 import enum
-from sqlalchemy import Integer, String, Enum
+from sqlalchemy import Integer, String, Enum, Index, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from models import Entity
 from models.address import Address
@@ -25,9 +25,17 @@ class EmployeeRole(str, enum.Enum):
 class Employee(Entity):
     __abstract__ = False
     __tablename__ = "employees"
+    __table_args__ = (
+        Index(
+            "uq_employee_email_active",
+            "email",
+            unique=True,
+            postgresql_where=text("deleted_at IS NULL"),
+        ),
+    )
 
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    email: Mapped[str] = mapped_column(String(255), nullable=False)
     age: Mapped[int] = mapped_column(Integer, nullable=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     address: Mapped[list["Address"]] = relationship(  # type:ignore
@@ -41,14 +49,3 @@ class Employee(Entity):
             values_callable=lambda enum_cls: [e.value for e in enum_cls],
         )
     )
-    # def to_api_dict(self) -> dict[str, Any]:
-    #     """JSON-friendly representation (ISO 8601 for timestamps)."""
-    #     return {
-    #         "id": self.id,
-    #         "name": self.name,
-    #         "email": self.email,
-    #         "age": self.age,
-    #         "created_at": datetime_to_iso(self.created_at),
-    #         "updated_at": datetime_to_iso(self.updated_at),
-    #         "deleted_at": datetime_to_iso(self.deleted_at),
-    #     }
