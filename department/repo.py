@@ -40,6 +40,8 @@ async def get_department_by_id(dept_id: int, db: AsyncSession):
     return department.first()
 
 
+# TODO
+# Before delting department delete the associations to it
 async def delete_department(department: Department, db: AsyncSession):
     department.deleted_at = datetime.now()
     db.add(department)

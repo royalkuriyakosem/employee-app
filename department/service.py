@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from department import repo
 from exceptions.handlers import NotFoundException
+from associations.repo import delete_associations_by_dept_id
 
 
 async def get_all_departments(db: AsyncSession):
@@ -31,6 +32,8 @@ async def get_department_by_id(dept_id: int, db: AsyncSession):
 
 
 async def delete_department_by_id(dept_id: int, db: AsyncSession):
-    department = await get_department_by_id(dept_id, db)
-    result = await repo.delete_department(department, db)
-    return result
+    delete_association = await delete_associations_by_dept_id(db, dept_id)
+    if delete_association is not None:
+        department = await get_department_by_id(dept_id, db)
+        result = await repo.delete_department(department, db)
+        return result

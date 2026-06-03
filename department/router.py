@@ -10,12 +10,16 @@ from department.schemas import DepartmentResponse
 router = APIRouter(prefix="/department", tags=["Department"])
 
 
-@router.get("", status_code=status.HTTP_302_FOUND)
+@router.get(
+    "", status_code=status.HTTP_302_FOUND, response_model=list[DepartmentResponse]
+)
 async def get_all_departments(db: AsyncSession = Depends(get_db)):
     departments = await service.get_all_departments(db)
     return [department for department in departments]
 
 
+# TODO
+# Department name should be unique
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def create_department(body: dict = Body(...), db: AsyncSession = Depends(get_db)):
     name = body.get("name")
