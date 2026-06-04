@@ -27,7 +27,7 @@ async def create_department(name: str, db: AsyncSession):
 async def get_department_by_id(dept_id: int, db: AsyncSession):
     department = await repo.get_department_by_id(dept_id, db)
     if not department:
-        raise NotFoundException("Department NOT FOUND")
+        raise NotFoundException(f"Department with id:{dept_id} NOT FOUND")
     return department
 
 

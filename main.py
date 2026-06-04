@@ -48,26 +48,6 @@ async def root():
     }
 
 
-# @dataclass
-# class Employee:
-#     name : str
-#     email : str
-#     # department : str
-#     # salary : int
-#     # hire_date : str
-#     # is_deleted : None
-
-
-# class CreateEmployeeResponse(TypedDict):
-#     id : int
-#     name : str
-#     email : str
-#     # department : str
-#     # salary : int
-#     # hire_date : str
-#     # is_deleted : None
-
-
 _employee = {}
 _id = 0
 
@@ -76,86 +56,12 @@ def get_next_id():
     return _id + 1
 
 
-# @app.get("/employee", tags=["Employees"])
-# async def get_all_employees(db: AsyncSession = Depends(get_db)):
-#     stmt = select(Employee).where(Employee.deleted_at.is_(None))
-#     result = await db.scalars(stmt)
-#     return [r.to_api_dict() for r in result.all()]
+# TODO
+# Delete the association related to employee before deleting the employee
 
 # TODO
-# check if the employee is deleted
-# if it is raise and exception
-# @app.get("/employee/{employee_id}", tags=["Employees"])
-# async def get_employees_by_id(employee_id , db: AsyncSession = Depends(get_db)):
-#     stmt = select(Employee).where(Employee.id == int(employee_id))
-#     result = await db.scalars(stmt)
-#     # return [r.to_api_dict() for r in result.all()]
-#     return result.all()
-
-
-# @app.post("/employee", status_code=status.HTTP_201_CREATED, tags=["Employees"])
-# async def create_employee(body: dict = Body(...), db: AsyncSession = Depends(get_db)):
-#     name = body.get("name")
-#     email = body.get("email")
-#     if not isinstance(name, str) or not name.strip():
-#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="name must be a non-empty string")
-#     if not isinstance(email, str) or not email.strip():
-#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="email must be a non-empty string")
-#     db_employee = Employee(name=name.strip(), email=email.strip())
-#     db.add(db_employee)
-#     try:
-#         await db.commit()
-#     except IntegrityError:
-#         await db.rollback()
-#         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Email '{email.strip()}' is already in use")
-#     await db.refresh(db_employee)
-#     return db_employee.to_api_dict()
+# Do proper logging
 
 
 # TODO
-# check if the employee is deleted
-# if it is raise and exception
-# @app.patch("/employee/{employee_id}", status_code=status.HTTP_201_CREATED, tags=["Employees"])
-# async def create_employee(employee_id:int, body: dict = Body(...), db: AsyncSession = Depends(get_db)):
-#     stmt = select(Employee).where(Employee.id == employee_id)
-#     result = await db.scalars(stmt)
-#     db_employee = result.first()
-
-#     if not db_employee or db_employee.deleted_at is NULL:
-#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST , detail=f'User not found')
-
-#     if "name" in body:
-#         db_employee.name = body.get("name")
-
-#     if "email" in body:
-#         db_employee.email = body.get("email")
-#     db.add(db_employee)
-#     try:
-#         await db.commit()
-#     except IntegrityError:
-#         await db.rollback()
-#         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Email '{email.strip()}' is already in use")
-#     await db.refresh(db_employee)
-#     return db_employee.to_api_dict()
-
-
-# @app.delete("/employee/{employee_id}", status_code=status.HTTP_200_OK, tags=["employee"])
-# async def delete_employees_by_id(employee_id : int, db : AsyncSession = Depends(get_db)):
-#     stmt = select(Employee).where(Employee.id == employee_id)
-#     result = await db.scalars(stmt)
-#     db_employee = result.first()
-
-#     if not db_employee or db_employee.deleted_at is NULL:
-#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST , detail=f'User not found')
-
-#     # db_employee.deleted_at =
-
-#     db.add(db_employee)
-
-#     try:
-#         await db.commit()
-#     except IntegrityError:
-#         await db.rollback()
-#         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'User not found')
-#     await db.refresh(db_employee)
-#     return {"message":"Employee deleted sucessfully"}
+# write tests
