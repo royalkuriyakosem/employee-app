@@ -68,8 +68,9 @@ class GetEmployeeById(EmployeeResponse):
     age: int | None
     created_at: datetime
     updated_at: datetime
-    # status: str
-    # experience: int
+    status: str
+    experience: int
+    address: list[AddressCreate]
 
 
 # class GetAllAddress(AddressCreate):

@@ -55,10 +55,11 @@ class Employee(Entity):
             values_callable=lambda enum_cls: [e.value for e in enum_cls],
         )
     )
-    status: Mapped[EmployeeRole] = mapped_column(
+    status: Mapped[EmployeeStatus] = mapped_column(
         Enum(
             EmployeeStatus,
             name="employeestatus",
             values_callable=lambda enum_cls: [e.value for e in enum_cls],
         )
     )
+    experience: Mapped[int] = mapped_column(Integer, nullable=True)

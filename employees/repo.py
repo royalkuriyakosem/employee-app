@@ -1,7 +1,7 @@
 """Employee repo"""
 
 from fastapi import HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from models.employee import Employee, Address
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
@@ -48,8 +48,13 @@ async def create_employee(
 
 
 async def get_employees_by_id(employee_id: int, db: AsyncSession):
-    stmt = select(Employee).where(
-        Employee.id == employee_id, Employee.deleted_at.is_(None)
+    # stmt = select(Employee).where(
+    #     Employee.id == employee_id, Employee.deleted_at.is_(None)
+    # )
+    stmt = (
+        select(Employee)
+        .options(selectinload(Employee.address))
+        .where(Employee.id == employee_id, Employee.deleted_at.is_(None))
     )
     result = await db.scalars(stmt)
     return result.first()
