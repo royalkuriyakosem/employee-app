@@ -1,5 +1,12 @@
-from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator
-from datetime import datetime
+from pydantic import (
+    BaseModel,
+    Field,
+    ConfigDict,
+    field_validator,
+    model_validator,
+    field_serializer,
+)
+from datetime import datetime, date
 from models.employee import EmployeeRole
 
 
@@ -46,13 +53,23 @@ class EmployeeResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     name: str
-    email: str
-    age: int | None
+    role: str
+    created_at: datetime
+    status: str
+
+    @field_serializer("created_at")
+    def serialize_created_at(self, value: datetime) -> date:
+        return value.date()
 
 
 class GetEmployeeById(EmployeeResponse):
+    id: int
+    email: str
+    age: int | None
     created_at: datetime
     updated_at: datetime
+    # status: str
+    # experience: int
 
 
 # class GetAllAddress(AddressCreate):

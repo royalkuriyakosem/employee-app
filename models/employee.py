@@ -22,6 +22,12 @@ class EmployeeRole(str, enum.Enum):
     HR = "HR"
 
 
+class EmployeeStatus(str, enum.Enum):
+    ACTIVE = "Active"
+    INACTIVE = "Inactive"
+    PROBATION = "Probation"
+
+
 class Employee(Entity):
     __abstract__ = False
     __tablename__ = "employees"
@@ -46,6 +52,13 @@ class Employee(Entity):
         Enum(
             EmployeeRole,
             name="employeerole",
+            values_callable=lambda enum_cls: [e.value for e in enum_cls],
+        )
+    )
+    status: Mapped[EmployeeRole] = mapped_column(
+        Enum(
+            EmployeeStatus,
+            name="employeestatus",
             values_callable=lambda enum_cls: [e.value for e in enum_cls],
         )
     )

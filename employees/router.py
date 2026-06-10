@@ -30,6 +30,7 @@ router = APIRouter(prefix="/employee", tags=["Employees"])
 async def create_employee(
     body: EmployeeCreate = Body(...), db: AsyncSession = Depends(get_db)
 ):
+    print(body)
     db_employee = await service.create_employee(body, db)
     return db_employee
 
@@ -156,6 +157,7 @@ async def update_employee(
     body: UpdateEmployee = Body(...),
     db: AsyncSession = Depends(get_db),
 ):
+    print("update employee", body)
     name = body.name
     email = body.email
     employee = await service.update_employee(employee_id, db, name, email)
