@@ -47,6 +47,8 @@ class EmployeeCreate(BaseModel):
     age: int | None = Field(ge=0, le=150)
     address: AddressCreate | None = None
     role: EmployeeRole = EmployeeRole.DEVELOPER
+    experience: int
+    status: str
 
 
 class EmployeeResponse(BaseModel):
@@ -81,6 +83,9 @@ class GetEmployeeById(EmployeeResponse):
 class UpdateEmployee(BaseModel):
     name: str
     email: str
+    role: str
+    status: str
+    experience: int
 
 
 class AddressResponse(AddressCreate):

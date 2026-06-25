@@ -43,16 +43,21 @@ async def delete_employees_by_id(employee_id: int, db: AsyncSession):
     return result
 
 
-async def update_employee(employee_id: int, db: AsyncSession, name: str, email: str):
+async def update_employee(employee_id: int, db: AsyncSession, body):
     employee = await repo.get_employees_by_id(employee_id, db)
     if employee is None:
         raise NotFoundException(f"User not found with id:{employee_id}")
-    result = await repo.update_employee(employee, db, name=name, email=email)
+    result = await repo.update_employee(employee, db, body)
     return result
 
 
 async def search_employee_by_name(employee_name: str, db: AsyncSession):
     employees = await repo.search_employees_by_name(employee_name, db)
+    return employees
+
+
+async def filter_employees_by_status(status: str, db: AsyncSession):
+    employees = await repo.filter_employees_by_name(status, db)
     return employees
 
 

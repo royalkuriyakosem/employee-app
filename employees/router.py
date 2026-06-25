@@ -49,6 +49,18 @@ async def search_employee_by_name(
 
 
 @router.get(
+    "/filter",
+    status_code=status.HTTP_200_OK,
+    response_model=list[EmployeeResponse],
+    dependencies=[Depends(require_role(EmployeeRole.HR))],
+)
+async def filter_employee_by_name(status: str, db: AsyncSession = Depends(get_db)):
+
+    employees = await service.filter_employees_by_status(status, db)
+    return [employee for employee in employees]
+
+
+@router.get(
     "/address", response_model=list[AddressCreate], status_code=status.HTTP_200_OK
 )
 async def get_all_address(
@@ -128,7 +140,11 @@ async def get_employees_by_id(
     return db_employees
 
 
-@router.get("", response_model=list[EmployeeResponse])
+@router.get(
+    "",
+    response_model=list[EmployeeResponse],
+    dependencies=[Depends(require_role(EmployeeRole.HR))],
+)
 async def get_all_employees(
     db: AsyncSession = Depends(get_db),
     dependencies=[Depends(require_role(EmployeeRole.HR))],
@@ -158,7 +174,5 @@ async def update_employee(
     db: AsyncSession = Depends(get_db),
 ):
     print("update employee", body)
-    name = body.name
-    email = body.email
-    employee = await service.update_employee(employee_id, db, name, email)
+    employee = await service.update_employee(employee_id, db, body)
     return employee

@@ -36,6 +36,8 @@ async def create_employee(
         address=[address] if body.address is not None else [],
         password_hash=hashed,
         role=body.role,
+        experience=body.experience,
+        status=body.status,
     )
     db.add(employee)
     try:
@@ -66,14 +68,22 @@ async def get_all_employees(db: AsyncSession):
     return employees.all()
 
 
-async def update_employee(
-    employee: Employee, db: AsyncSession, name: str = None, email: str = None
-):
-    if name is not None:
-        employee.name = name
-    if email is not None:
-        employee.email = email
+async def update_employee(employee: Employee, db: AsyncSession, body: any):
+    # if name is not None:
+    #     employee.name = name
+    # if email is not None:
+    #     employee.email = email
+    print(
+        "------------------------------------",
+        body,
+        "------------------------------------------------",
+    )
     employee.updated_at = datetime.now()
+    employee.experience = body.experience
+    employee.role = body.role
+    employee.name = body.name
+    employee.email = body.email
+    employee.status = body.status
     db.add(employee)
     try:
         await db.commit()
@@ -81,7 +91,7 @@ async def update_employee(
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Email '{email.strip()}' is already in use",
+            detail=f"Email '{body.email.strip()}' is already in use",
         )
     await db.refresh(employee)
     return employee
@@ -104,6 +114,13 @@ async def delete_employees_by_id(db_employee: Employee, db: AsyncSession):
 
 async def search_employees_by_name(employee_name: str, db: AsyncSession):
     stmt = select(Employee).where(Employee.name.like(f"%{employee_name}%"))
+    result = await db.scalars(stmt)
+    db_employee = result.all()
+    return db_employee
+
+
+async def filter_employees_by_name(status: str, db: AsyncSession):
+    stmt = select(Employee).where(Employee.status == status)
     result = await db.scalars(stmt)
     db_employee = result.all()
     return db_employee
