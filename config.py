@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     jwt_refresh_secret: str
     jwt_refresh_expiry: int
     jwt_refresh_algorithm: str
-
+    groq_api_key: str
     model_config = SettingsConfigDict(env_file=".env")
 
 
